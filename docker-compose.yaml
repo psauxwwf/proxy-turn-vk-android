@@ -1,0 +1,28 @@
+services:
+  wdtt-server:
+    image: ghcr.io/psauxwwf/wdtt-server:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      cache_from:
+        - type=registry,ref=ghcr.io/psauxwwf/wdtt-server:latest
+      cache_to:
+        - type=inline
+    container_name: wdtt-server
+    command:
+      - -listen
+      - 0.0.0.0:56000
+      - -wg-port
+      - "56001"
+      - -config-dir
+      - /etc/wdtt
+      - -password
+      - ${WDTT_MAIN_PASSWORD:-change-me}
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    network_mode: host
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    volumes:
+      - ./wdtt:/etc/wdtt
